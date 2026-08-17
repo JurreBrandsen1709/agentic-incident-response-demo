@@ -24,3 +24,8 @@ pre-triage script did, and it is already in the Issue body.
 8. Open a pull request. Never merge, never push directly to `main`.
 9. If you are not confident in the root cause, say so explicitly in the PR
    description rather than presenting a guess as a conclusion.
+10. Before you finish, an automated check verifies that any change under
+    `app/src/` is accompanied by a test and a PIR. If it blocks you with a
+    reason, address what's missing. If a test or PIR genuinely isn't
+    warranted, explain why and include the literal line
+    `OVERRIDE: <reason>` in your final message to proceed anyway.
