@@ -1,6 +1,6 @@
-# .NET build output
-bin/
-obj/
+# .NET build output (all project folders, including nested bin/obj directories)
+**/bin/
+**/obj/
 
 # Visual Studio
 .vs/
