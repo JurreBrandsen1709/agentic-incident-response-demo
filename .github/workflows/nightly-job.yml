@@ -1,0 +1,32 @@
+name: Nightly Reconciliation Job
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  run-job:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Run reconciliation job
+        id: run
+        run: |
+          OUTPUT=$(dotnet run --project app/src/ReconciliationJob -- fixtures/boundary-batch.json 2026-01-01T00:00:00Z 2026-01-02T00:00:00Z)
+          echo "$OUTPUT"
+          COUNT=$(echo "$OUTPUT" | grep -oP 'records_processed: \K\d+')
+          echo "count=$COUNT" >> "$GITHUB_OUTPUT"
+
+      - name: Fire simulated anomaly alert if outside baseline
+        if: steps.run.outputs.count < 150 || steps.run.outputs.count > 400
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: node scripts/simulate-alert.js "${{ steps.run.outputs.count }}"
