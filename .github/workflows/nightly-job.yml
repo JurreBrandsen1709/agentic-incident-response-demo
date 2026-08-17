@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   run-job:
@@ -22,6 +22,10 @@ jobs:
           OUTPUT=$(dotnet run --project app/src/ReconciliationJob -- fixtures/boundary-batch.json 2026-01-01T00:00:00Z 2026-01-02T00:00:00Z)
           echo "$OUTPUT"
           COUNT=$(echo "$OUTPUT" | grep -oP 'records_processed: \K\d+')
+          if [ -z "$COUNT" ]; then
+            echo "::error::Could not extract records_processed from job output"
+            exit 1
+          fi
           echo "count=$COUNT" >> "$GITHUB_OUTPUT"
 
       - name: Fire simulated anomaly alert if outside baseline
