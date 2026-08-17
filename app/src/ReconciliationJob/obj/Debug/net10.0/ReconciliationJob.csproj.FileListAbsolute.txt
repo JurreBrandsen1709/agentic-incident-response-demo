@@ -1,0 +1,15 @@
+C:\Users\JurreB\projects\agentic-incident-response-demo\app\src\ReconciliationJob\bin\Debug\net10.0\ReconciliationJob.exe
+C:\Users\JurreB\projects\agentic-incident-response-demo\app\src\ReconciliationJob\bin\Debug\net10.0\ReconciliationJob.deps.json
+C:\Users\JurreB\projects\agentic-incident-response-demo\app\src\ReconciliationJob\bin\Debug\net10.0\ReconciliationJob.runtimeconfig.json
+C:\Users\JurreB\projects\agentic-incident-response-demo\app\src\ReconciliationJob\bin\Debug\net10.0\ReconciliationJob.dll
+C:\Users\JurreB\projects\agentic-incident-response-demo\app\src\ReconciliationJob\bin\Debug\net10.0\ReconciliationJob.pdb
+C:\Users\JurreB\projects\agentic-incident-response-demo\app\src\ReconciliationJob\obj\Debug\net10.0\ReconciliationJob.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\JurreB\projects\agentic-incident-response-demo\app\src\ReconciliationJob\obj\Debug\net10.0\ReconciliationJob.AssemblyInfoInputs.cache
+C:\Users\JurreB\projects\agentic-incident-response-demo\app\src\ReconciliationJob\obj\Debug\net10.0\ReconciliationJob.AssemblyInfo.cs
+C:\Users\JurreB\projects\agentic-incident-response-demo\app\src\ReconciliationJob\obj\Debug\net10.0\ReconciliationJob.csproj.CoreCompileInputs.cache
+C:\Users\JurreB\projects\agentic-incident-response-demo\app\src\ReconciliationJob\obj\Debug\net10.0\ReconciliationJob.sourcelink.json
+C:\Users\JurreB\projects\agentic-incident-response-demo\app\src\ReconciliationJob\obj\Debug\net10.0\ReconciliationJob.dll
+C:\Users\JurreB\projects\agentic-incident-response-demo\app\src\ReconciliationJob\obj\Debug\net10.0\refint\ReconciliationJob.dll
+C:\Users\JurreB\projects\agentic-incident-response-demo\app\src\ReconciliationJob\obj\Debug\net10.0\ReconciliationJob.pdb
+C:\Users\JurreB\projects\agentic-incident-response-demo\app\src\ReconciliationJob\obj\Debug\net10.0\ReconciliationJob.genruntimeconfig.cache
+C:\Users\JurreB\projects\agentic-incident-response-demo\app\src\ReconciliationJob\obj\Debug\net10.0\ref\ReconciliationJob.dll
