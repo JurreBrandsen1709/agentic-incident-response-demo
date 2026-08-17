@@ -63,6 +63,68 @@ not copy branch protection rules.
    the job resolves (`records_processed: 5`, not `0`) — the incident is
    closed, not just the PR merged.
 
+## Verifying a fresh instance end-to-end
+
+Before relying on the template for a live demo, verify it on a disposable
+instance rather than on the template source repo itself. Each `claude-code-action`
+run in step 5 below is a real, billed Claude API call — don't re-run it
+speculatively; only trigger it once you're confident the rest of the pipeline
+(seed → nightly job → pre-triage → issue) already worked.
+
+1. Generate a disposable instance:
+   ```bash
+   gh repo create <you>/incident-demo-check --public \
+     --template JurreBrandsen1709/agentic-incident-response-demo
+   ```
+
+2. Re-apply branch protection (not copied by template generation):
+   ```bash
+   gh api -X PUT repos/<you>/incident-demo-check/branches/main/protection \
+     --input branch-protection.json
+   ```
+   where `branch-protection.json` contains:
+   ```json
+   {
+     "required_status_checks": null,
+     "enforce_admins": true,
+     "required_pull_request_reviews": { "required_approving_review_count": 0 },
+     "restrictions": null
+   }
+   ```
+   Write this file without a UTF-8 BOM (e.g. via `[System.IO.File]::WriteAllText`
+   on Windows) — a BOM makes GitHub's API reject the JSON with a parsing error.
+
+3. Set both secrets on the new instance (a fine-grained `DEMO_PAT` scoped to
+   *this* repo only, not reused from another instance):
+   ```bash
+   gh secret set ANTHROPIC_API_KEY --repo <you>/incident-demo-check
+   gh secret set DEMO_PAT --repo <you>/incident-demo-check
+   ```
+
+4. Run through "Run it" above (seed → merge → trigger → wait for the issue).
+
+5. Once the `incident:triage-ready` issue exists, confirm `incident-agent.yml`
+   picked it up (`gh run list --workflow=incident-agent.yml`), then review and
+   merge its PR, then re-run `nightly-job.yml` to confirm resolution.
+
+6. Delete the disposable instance once done: `gh repo delete <you>/incident-demo-check --yes`.
+
+**Important — never run `seed.yml` against the actual template source repo.**
+Doing so leaves `RecordStore.cs` permanently in its buggy state on `main`, so
+every future instance generated from the template inherits the bug already
+applied and `seed-bug.js` fails with "Expected line not found" (there's no
+longer an inclusive-bound line left to replace). If this happens, merge the
+agent's fix PR on the source repo to restore it to a clean state before
+generating any more instances.
+
+**Also note:** template generation squashes history into a single "Initial
+commit" — if an instance's bug came from generation rather than a real
+`seed.yml` run, the pre-triage issue's "Deploy diff" section shows that
+generic initial commit instead of the disguised refactor commit message,
+which weakens the demo's "boring commit hid the bug" narrative. Always run
+`seed.yml` for a genuinely fresh instance rather than starting from an
+already-seeded template.
+
 ## Repository layout
 
 - `app/` — the staged .NET reconciliation job and its tests.
