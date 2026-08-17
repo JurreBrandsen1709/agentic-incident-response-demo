@@ -32,4 +32,4 @@ jobs:
           prompt: ${{ steps.prompt.outputs.content }}
           show_full_output: true
           claude_args: |
-            --allowedTools Read,Grep,Glob,Edit
+            --allowedTools Read,Grep,Glob,Edit,Bash
