@@ -1,0 +1,7 @@
+[
+  { "id": "r1", "timestampUtc": "2026-01-02T00:00:00Z", "amount": 120.50 },
+  { "id": "r2", "timestampUtc": "2026-01-02T00:00:00Z", "amount": 45.00 },
+  { "id": "r3", "timestampUtc": "2026-01-02T00:00:00Z", "amount": 78.25 },
+  { "id": "r4", "timestampUtc": "2026-01-02T00:00:00Z", "amount": 200.00 },
+  { "id": "r5", "timestampUtc": "2026-01-02T00:00:00Z", "amount": 15.75 }
+]
