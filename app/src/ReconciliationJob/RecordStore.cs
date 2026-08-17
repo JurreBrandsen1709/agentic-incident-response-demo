@@ -33,7 +33,7 @@ public class RecordStore : IRecordStore
     public IReadOnlyList<Record> GetRecordsForWindow(DateTime fromUtc, DateTime toUtc)
     {
         return _records
-            .Where(r => r.TimestampUtc >= fromUtc && r.TimestampUtc < toUtc)
+            .Where(r => r.TimestampUtc >= fromUtc && r.TimestampUtc <= toUtc)
             .ToList();
     }
 
