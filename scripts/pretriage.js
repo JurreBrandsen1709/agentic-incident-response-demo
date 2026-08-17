@@ -13,7 +13,8 @@ function sanitizeForIssueBody(text) {
   return String(text)
     .replace(/<!--[\s\S]*?-->/g, "[removed: html comment]")
     .replace(/[​-‍﻿]/g, "")
-    .replace(/ignore (all )?previous instructions/gi, "[removed: instruction-like phrase]");
+    .replace(/ignore (all )?previous instructions/gi, "[removed: instruction-like phrase]")
+    .replace(/```/g, "'''");
 }
 
 function keywordsFromText(text) {
@@ -196,7 +197,7 @@ async function main() {
   const adrMatch = findAdrMatch(alertKeywords, deployDiff);
 
   const body = renderIssueBody({ alert, deployDiff, pastIncident, adrMatch });
-  const title = `Anomaly: ${alert.metric} observed at ${alert.observed}, expected ${alert.expectedRange?.[0]}-${alert.expectedRange?.[1]}`;
+  const title = `Anomaly: ${sanitizeForIssueBody(alert.metric)} observed at ${alert.observed}, expected ${alert.expectedRange?.[0]}-${alert.expectedRange?.[1]}`;
 
   await ensureLabelExists(repo, token);
   const issue = await createIssue(repo, token, title, body);
