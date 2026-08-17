@@ -1,0 +1,34 @@
+name: Incident Agent
+
+on:
+  issues:
+    types: [labeled]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: read
+
+jobs:
+  respond:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Load incident-responder system prompt
+        id: prompt
+        run: |
+          {
+            echo 'content<<PROMPT_EOF'
+            cat .github/agents/incident-responder.md
+            echo PROMPT_EOF
+          } >> "$GITHUB_OUTPUT"
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          label_trigger: "incident:triage-ready"
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.DEMO_PAT }}
+          prompt: ${{ steps.prompt.outputs.content }}
+          claude_args: |
+            --allowedTools Read,Grep,Glob,Edit
