@@ -8,11 +8,26 @@ if (args.Length < 3)
 }
 
 var fixturePath = args[0];
-var fromUtc = DateTime.Parse(args[1], CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal);
-var toUtc = DateTime.Parse(args[2], CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal);
 
-IRecordStore store = RecordStore.FromFixtureFile(fixturePath);
-var records = store.GetRecordsForWindow(fromUtc, toUtc);
+try
+{
+    var fromUtc = DateTime.Parse(args[1], CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal);
+    var toUtc = DateTime.Parse(args[2], CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal);
 
-Console.WriteLine($"records_processed: {records.Count}");
-return 0;
+    if (fromUtc > toUtc)
+    {
+        Console.Error.WriteLine("fromUtc must not be after toUtc");
+        return 1;
+    }
+
+    IRecordStore store = RecordStore.FromFixtureFile(fixturePath);
+    var records = store.GetRecordsForWindow(fromUtc, toUtc);
+
+    Console.WriteLine($"records_processed: {records.Count}");
+    return 0;
+}
+catch (Exception ex) when (ex is FormatException or IOException or UnauthorizedAccessException)
+{
+    Console.Error.WriteLine($"Failed to process reconciliation batch: {ex.Message}");
+    return 2;
+}
