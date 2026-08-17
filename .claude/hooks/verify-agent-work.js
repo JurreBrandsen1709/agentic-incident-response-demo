@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 // Stop hook: before the incident-responder agent finishes, checks that a
-// committed code fix is backed by a regression test and a filled-in PIR.
-// Blocks with a reason (Claude keeps working) rather than failing the job.
-// An explicit "OVERRIDE: <reason>" line in the final message bypasses this,
-// for cases where a test or PIR genuinely isn't warranted.
+// committed code fix is backed by a regression test AND a PIR FILE (not
+// PR-description text -- both must be real files in the diff). Blocks with a
+// reason (Claude keeps working) rather than failing the job. An explicit
+// "OVERRIDE: <reason>" line in the final message bypasses this, for the rare
+// case where a test or PIR genuinely isn't warranted (e.g. coverage for this
+// exact regression already exists -- name it explicitly in the override).
 
 const { execSync } = require("child_process");
 
@@ -53,22 +55,33 @@ async function main() {
   const testsChanged = files.some((f) => /^app\/tests\/.*\.cs$/.test(f));
   const pirAdded = files.some((f) => /^incident-log\/PIR-.*\.md$/.test(f));
 
-  const missing = [];
-  if (!testsChanged) missing.push("a regression test under app/tests/");
-  if (!pirAdded) missing.push("a filled-in PIR at incident-log/PIR-<date>.md");
-
-  if (missing.length === 0) {
+  if (testsChanged && pirAdded) {
     process.exit(0);
+  }
+
+  const missing = [];
+  if (!testsChanged) {
+    missing.push(
+      "a new test under app/tests/ (via the Edit or Write tool -- add a [Fact] that " +
+        "fails against the old, buggy code and passes against your fix)"
+    );
+  }
+  if (!pirAdded) {
+    missing.push(
+      "a PIR file (call the Write tool with file_path set to exactly " +
+        "incident-log/PIR-<today's date>.md and content based on incident-log/PIR-template.md " +
+        "-- a PR description section is not a substitute, it must be a real file in the diff)"
+    );
   }
 
   console.log(
     JSON.stringify({
       decision: "block",
       reason:
-        `Your branch changes app/src/ but is missing ${missing.join(" and ")}. ` +
-        `Add ${missing.length > 1 ? "these" : "this"} before finishing. If it genuinely ` +
-        `isn't needed, explain why and include the literal line "OVERRIDE: <reason>" ` +
-        `in your final message.`,
+        `Your branch changes app/src/ but is still missing ${missing.join(" and ")}. ` +
+        'If either genuinely isn\'t needed -- for example, an existing test by a specific ' +
+        'name already fails against this exact regression -- explain why and include the ' +
+        'literal line "OVERRIDE: <reason>" in your final message.',
     })
   );
 }
