@@ -32,4 +32,5 @@ jobs:
           prompt: ${{ steps.prompt.outputs.content }}
           show_full_output: true
           claude_args: |
-            --allowedTools Read,Grep,Glob,Edit
+            --model haiku
+            --allowedTools Read,Grep,Glob,Edit,Bash
