@@ -24,7 +24,10 @@ jobs:
         run: |
           {
             echo 'content<<PROMPT_EOF'
-            cat .github/agents/incident-responder.md
+            echo "Use the custom agent defined in .claude/agents/incident-responder.md."
+            echo "Read it and follow its instructions exactly for this task."
+            echo ""
+            cat .claude/agents/incident-responder.md
             echo ""
             echo "## Triggering Issue"
             echo ""
