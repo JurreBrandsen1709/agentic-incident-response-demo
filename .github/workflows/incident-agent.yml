@@ -43,6 +43,7 @@ jobs:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           github_token: ${{ secrets.DEMO_PAT }}
           prompt: ${{ steps.prompt.outputs.content }}
+          show_full_output: true
           claude_args: |
             --model haiku
             --allowedTools "Read,Grep,Glob,Edit,Write(incident-log/PIR-*.md),Bash(git init:*),Bash(git checkout:*),Bash(git add:*),Bash(git commit:*),Bash(git push:*),Bash(gh pr create:*),Bash(dotnet build:*),Bash(dotnet test:*),Bash(dotnet clean:*)"
