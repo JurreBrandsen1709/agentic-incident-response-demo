@@ -46,5 +46,5 @@ jobs:
           show_full_output: true
           claude_args: |
             --model haiku
-            --allowedTools "Read,Grep,Glob,Edit,Write(incident-log/PIR-*.md),Bash(git init:*),Bash(git checkout:*),Bash(git add:*),Bash(git commit:*),Bash(git push:*),Bash(gh pr create:*),Bash(dotnet build:*),Bash(dotnet test:*),Bash(dotnet clean:*)"
+            --allowedTools "Read,Grep,Glob,Edit,Write,Bash(git init:*),Bash(git checkout:*),Bash(git add:*),Bash(git commit:*),Bash(git push:*),Bash(gh pr create:*),Bash(dotnet build:*),Bash(dotnet test:*),Bash(dotnet clean:*)"
             --disallowedTools "Bash(gh pr merge:*),Bash(gh pr edit:*),Bash(gh api:*)"
