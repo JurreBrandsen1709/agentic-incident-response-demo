@@ -47,4 +47,4 @@ jobs:
           claude_args: |
             --model haiku
             --allowedTools "Read,Grep,Glob,Edit,Write,Bash(git init:*),Bash(git checkout:*),Bash(git add:*),Bash(git commit:*),Bash(git push:*),Bash(gh pr create:*),Bash(gh issue comment:*),Bash(dotnet build:*),Bash(dotnet test:*),Bash(dotnet clean:*)"
-            --disallowedTools "Bash(gh pr merge:*),Bash(gh pr edit:*),Bash(gh issue close:*),Bash(gh issue edit:*),Bash(gh api:*)"
+            --disallowedTools "Bash(gh pr merge:*),Bash(gh pr edit:*),Bash(gh issue close:*),Bash(gh issue edit:*),Bash(gh api:*),Edit(.github/**),Write(.github/**),Edit(.claude/**),Write(.claude/**)"
