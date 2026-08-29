@@ -1,27 +1,65 @@
 #!/usr/bin/env node
-// Seeds this repo instance with the incident this demo is built around:
-// a real, merged PR that changes an inclusive boundary comparison to an
-// exclusive one, disguised behind a boring commit message. Run once per
-// freshly generated template instance.
+// Seeds this repo instance with the incident this demo is built around: an
+// upstream partner (ACME) silently changes their nightly export's date format,
+// and our ingest job quietly drops every row instead of crashing. The only
+// change to OUR code is a genuinely harmless one-line report-header tweak,
+// disguised behind the same boring "cleanup" commit message a real innocent
+// commit would carry. Run once per freshly generated template instance.
 
 const { execSync } = require("child_process");
 const fs = require("fs");
 
-const FILE = "app/src/ReconciliationJob/RecordStore.cs";
-const BRANCH = "seed/boundary-refactor";
-const OLD_LINE = "r.TimestampUtc >= fromUtc && r.TimestampUtc <= toUtc";
-const NEW_LINE = "r.TimestampUtc >= fromUtc && r.TimestampUtc < toUtc";
+const PROGRAM_FILE = "app/src/ReconciliationJob/Program.cs";
+const HEADER_LINE =
+  '    Console.WriteLine($"Reconciliation report for window {fromUtc:yyyy-MM-dd HH:mm} UTC to {toUtc:yyyy-MM-dd HH:mm} UTC");';
+const ANCHOR_LINE = "    IRecordStore store = RecordStore.FromCsvFile(fixturePath);";
+
+const CURRENT_FIXTURE = "fixtures/partner-export-current.csv";
+const BAD_FIXTURE = "fixtures/partner-export-bad.csv";
+const SEED_STATE_FILE = "incident-log/seed-state.json";
+
+const BRANCH = "seed/partner-export-format-change";
 
 function run(cmd) {
   execSync(cmd, { stdio: "inherit" });
 }
 
-function applyBugChange() {
-  const content = fs.readFileSync(FILE, "utf8");
-  if (!content.includes(OLD_LINE)) {
-    throw new Error(`Expected line not found in ${FILE}. Has the file already been seeded or changed?`);
+function applyInnocentChange() {
+  const content = fs.readFileSync(PROGRAM_FILE, "utf8");
+  if (content.includes(HEADER_LINE)) {
+    throw new Error(
+      `${PROGRAM_FILE} already has the report-header line. Has this instance already been seeded? ` +
+        `Never run this against the template source repo itself.`
+    );
   }
-  fs.writeFileSync(FILE, content.replace(OLD_LINE, NEW_LINE));
+  if (!content.includes(ANCHOR_LINE)) {
+    throw new Error(`Expected anchor line not found in ${PROGRAM_FILE}. Has the file changed shape?`);
+  }
+  fs.writeFileSync(PROGRAM_FILE, content.replace(ANCHOR_LINE, `${HEADER_LINE}\n\n${ANCHOR_LINE}`));
+}
+
+function swapInBadExport() {
+  fs.copyFileSync(BAD_FIXTURE, CURRENT_FIXTURE);
+}
+
+function writeSeedState() {
+  const now = Date.now();
+  const hoursAgo = (h) => new Date(now - h * 60 * 60 * 1000).toISOString();
+
+  fs.writeFileSync(
+    SEED_STATE_FILE,
+    JSON.stringify(
+      {
+        simulated: true,
+        note: "Timestamps below are simulated for demo narrative pacing (this script can be re-run per template instance, so the real commit timestamp won't line up with a fixed story timeline).",
+        refactorCommitUtc: hoursAgo(18),
+        upstreamChangeUtc: hoursAgo(11),
+        upstreamChangeDescription: "ACME partner export format changed from YYYY-MM-DD to DD-MM-YYYY",
+      },
+      null,
+      2
+    ) + "\n"
+  );
 }
 
 async function openPullRequest(repo, token) {
@@ -82,8 +120,10 @@ async function main() {
   }
 
   run(`git checkout -b ${BRANCH}`);
-  applyBugChange();
-  run(`git add ${FILE}`);
+  applyInnocentChange();
+  swapInBadExport();
+  writeSeedState();
+  run(`git add ${PROGRAM_FILE} ${CURRENT_FIXTURE} ${SEED_STATE_FILE}`);
   run(`git commit -m "refactor: clean up date formatting for the report header"`);
   run(`git push origin ${BRANCH}`);
 

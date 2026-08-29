@@ -1,4 +1,4 @@
-name: Seed Demo Bug
+name: Seed Demo Incident
 
 on:
   workflow_dispatch:
@@ -20,8 +20,8 @@ jobs:
           git config user.name "demo-seed-bot"
           git config user.email "demo-seed-bot@users.noreply.github.com"
 
-      - name: Seed the bug
+      - name: Seed the incident
         env:
           GITHUB_TOKEN: ${{ secrets.DEMO_PAT }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-        run: node scripts/seed-bug.js
+        run: node scripts/seed-incident.js

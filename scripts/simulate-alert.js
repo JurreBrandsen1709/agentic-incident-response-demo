@@ -15,7 +15,7 @@ if (!repo || !token) {
 const alert = {
   metric: "records_processed",
   observed: observedValue,
-  expectedRange: [150, 400],
+  expectedRange: [4, 6],
   timestampUtc: new Date().toISOString(),
   source: "simulated-app-insights",
 };

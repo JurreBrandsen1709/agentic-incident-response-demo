@@ -1,10 +1,11 @@
 using System.Globalization;
-using System.Text.Json;
 
 namespace ReconciliationJob;
 
 public class RecordStore : IRecordStore
 {
+    private static readonly string[] AcceptedDateFormats = { "yyyy-MM-dd" };
+
     private readonly IReadOnlyList<Record> _records;
 
     public RecordStore(IReadOnlyList<Record> records)
@@ -12,20 +13,39 @@ public class RecordStore : IRecordStore
         _records = records;
     }
 
-    public static RecordStore FromFixtureFile(string fixturePath)
+    public static RecordStore FromCsvFile(string csvPath)
     {
-        var json = File.ReadAllText(fixturePath);
-        var raw = JsonSerializer.Deserialize<List<RawRecord>>(json, new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        }) ?? throw new InvalidOperationException($"Fixture at {fixturePath} contained no records.");
+        var lines = File.ReadAllLines(csvPath);
+        var records = new List<Record>();
+        var skipped = 0;
 
-        var records = raw
-            .Select(r => new Record(
-                r.Id,
-                DateTime.Parse(r.TimestampUtc, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal),
-                r.Amount))
-            .ToList();
+        foreach (var line in lines.Skip(1)) // header: id,timestampUtc,amount
+        {
+            if (string.IsNullOrWhiteSpace(line)) continue;
+
+            var fields = line.Split(',');
+            var timestampUtc = default(DateTime);
+            var amount = default(decimal);
+            var parsed = fields.Length == 3
+                && DateTime.TryParseExact(
+                    fields[1], AcceptedDateFormats, CultureInfo.InvariantCulture,
+                    DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal,
+                    out timestampUtc)
+                && decimal.TryParse(fields[2], NumberStyles.Number, CultureInfo.InvariantCulture, out amount);
+
+            if (!parsed)
+            {
+                skipped++;
+                continue;
+            }
+
+            records.Add(new Record(fields[0], timestampUtc, amount));
+        }
+
+        if (skipped > 0)
+        {
+            Console.Error.WriteLine($"Skipped {skipped} row(s) with an unrecognized date format.");
+        }
 
         return new RecordStore(records);
     }
@@ -35,12 +55,5 @@ public class RecordStore : IRecordStore
         return _records
             .Where(r => r.TimestampUtc >= fromUtc && r.TimestampUtc <= toUtc)
             .ToList();
-    }
-
-    private class RawRecord
-    {
-        public string Id { get; set; } = "";
-        public string TimestampUtc { get; set; } = "";
-        public decimal Amount { get; set; }
     }
 }

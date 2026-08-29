@@ -20,7 +20,9 @@ try
         return 1;
     }
 
-    IRecordStore store = RecordStore.FromFixtureFile(fixturePath);
+    Console.WriteLine($"Reconciliation report for window {fromUtc:yyyy-MM-dd HH:mm} UTC to {toUtc:yyyy-MM-dd HH:mm} UTC");
+
+    IRecordStore store = RecordStore.FromCsvFile(fixturePath);
     var records = store.GetRecordsForWindow(fromUtc, toUtc);
 
     Console.WriteLine($"records_processed: {records.Count}");
