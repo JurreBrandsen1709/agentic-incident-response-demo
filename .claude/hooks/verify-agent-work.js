@@ -8,6 +8,16 @@
 // for the rare case where a test or PIR genuinely isn't warranted (e.g.
 // coverage for this exact regression already exists -- name it explicitly
 // in the override).
+//
+// Scoped to CI only (GITHUB_ACTIONS=true, set automatically by Actions
+// runners): this hook exists to gate the incident-responder persona's
+// automated runs in incident-agent.yml, not local Claude Code sessions
+// doing general development on this repo. A local session's diff against
+// origin/main will often carry unmerged app/src changes with no PIR for
+// reasons that have nothing to do with incident response, and the check
+// below is a whole-branch diff, not a per-turn one -- without this guard
+// it would block every single Stop event in a local session, forever,
+// until origin/main caught up.
 
 const { execSync } = require("child_process");
 
@@ -34,6 +44,10 @@ function changedFiles() {
 }
 
 async function main() {
+  if (process.env.GITHUB_ACTIONS !== "true") {
+    process.exit(0);
+  }
+
   const raw = await readStdin();
   let input = {};
   try {
