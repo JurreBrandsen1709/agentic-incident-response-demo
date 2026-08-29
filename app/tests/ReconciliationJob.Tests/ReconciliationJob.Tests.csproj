@@ -22,4 +22,11 @@
     <ProjectReference Include="..\..\src\ReconciliationJob\ReconciliationJob.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="..\..\..\fixtures\*.csv">
+      <Link>fixtures\%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

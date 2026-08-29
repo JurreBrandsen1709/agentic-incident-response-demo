@@ -20,7 +20,7 @@ try
         return 1;
     }
 
-    IRecordStore store = RecordStore.FromFixtureFile(fixturePath);
+    IRecordStore store = RecordStore.FromCsvFile(fixturePath);
     var records = store.GetRecordsForWindow(fromUtc, toUtc);
 
     Console.WriteLine($"records_processed: {records.Count}");
