@@ -7,7 +7,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
-  issues: read
+  issues: write
 
 jobs:
   respond:
@@ -45,5 +45,5 @@ jobs:
           prompt: ${{ steps.prompt.outputs.content }}
           claude_args: |
             --model haiku
-            --allowedTools "Read,Grep,Glob,Edit,Write(incident-log/PIR-*.md),Bash(git init:*),Bash(git checkout:*),Bash(git add:*),Bash(git commit:*),Bash(git push:*),Bash(gh pr create:*),Bash(dotnet build:*),Bash(dotnet test:*),Bash(dotnet clean:*)"
-            --disallowedTools "Bash(gh pr merge:*),Bash(gh pr edit:*),Bash(gh api:*)"
+            --allowedTools "Read,Grep,Glob,Edit,Write(incident-log/PIR-*.md),Bash(git init:*),Bash(git checkout:*),Bash(git add:*),Bash(git commit:*),Bash(git push:*),Bash(gh pr create:*),Bash(gh issue comment:*),Bash(dotnet build:*),Bash(dotnet test:*),Bash(dotnet clean:*)"
+            --disallowedTools "Bash(gh pr merge:*),Bash(gh pr edit:*),Bash(gh issue close:*),Bash(gh issue edit:*),Bash(gh api:*)"
