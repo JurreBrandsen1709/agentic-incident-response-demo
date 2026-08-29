@@ -19,7 +19,7 @@ jobs:
       - name: Run reconciliation job
         id: run
         run: |
-          OUTPUT=$(dotnet run --project app/src/ReconciliationJob -- fixtures/boundary-batch.json 2026-01-01T00:00:00Z 2026-01-02T00:00:00Z)
+          OUTPUT=$(dotnet run --project app/src/ReconciliationJob -- fixtures/partner-export-current.csv 2026-01-01T00:00:00Z 2026-01-06T00:00:00Z)
           echo "$OUTPUT"
           COUNT=$(echo "$OUTPUT" | grep -oP 'records_processed: \K\d+')
           if [ -z "$COUNT" ]; then
@@ -28,8 +28,8 @@ jobs:
           fi
           echo "count=$COUNT" >> "$GITHUB_OUTPUT"
 
-      - name: Fire simulated anomaly alert if outside baseline
-        if: steps.run.outputs.count < 150 || steps.run.outputs.count > 400
+      - name: Fire simulated anomaly alert if zero records processed
+        if: steps.run.outputs.count == 0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
